@@ -25,41 +25,44 @@ THE SOFTWARE.
 
 #include "cocos2d.h"
 
-class CCGestureRecognizer : public cocos2d::CCLayer
+class CCGestureRecognizer : public cocos2d::Layer
 {
 public:
     CCGestureRecognizer();
     ~CCGestureRecognizer();
-    void setTarget(cocos2d::CCObject * tar, cocos2d::SEL_CallFuncO sel);
+    void setTarget(cocos2d::Object * tar, cocos2d::SEL_CallFuncO sel);
+    void setTarget(const std::function<void(cocos2d::Object*)> &callback);
     
     //setParent is called after the layer is added as a child
-    virtual void setParent(cocos2d::CCNode*p);
+    virtual void setParent(cocos2d::Node*p);
 protected:
-    cocos2d::CCRect frame;
+    cocos2d::Rect frame;
     bool isRecognizing;
     
-    void gestureRecognized(cocos2d::CCObject * gesture);
-    void stopTouchesPropagation(cocos2d::CCSet * pTouches, cocos2d::CCEvent * pEvent);
+    void gestureRecognized(cocos2d::Object * gesture);
+    void stopTouchesPropagation(cocos2d::Set * pTouches, cocos2d::Event * pEvent);
     
     //utility methods
-    bool isPositionBetweenBounds(cocos2d::CCPoint pos);
-    float distanceBetweenPoints(cocos2d::CCPoint p1, cocos2d::CCPoint p2);
-    cocos2d::CCSet * createSetWithTouch(cocos2d::CCTouch * pTouch);
-    
-    virtual void registerWithTouchDispatcher(void);
+    bool isPositionBetweenBounds(cocos2d::Point pos);
+    float distanceBetweenPoints(cocos2d::Point p1, cocos2d::Point p2);
+    cocos2d::Set * createSetWithTouch(cocos2d::Touch * pTouch);
+
+    //virtual void registerWithTouchDispatcher(void);
     
     //mandatory methods for subclasses
-    virtual bool ccTouchBegan(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent)=0;
-    virtual void ccTouchMoved(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent)=0;
-    virtual void ccTouchEnded(cocos2d::CCTouch * pTouch, cocos2d::CCEvent * pEvent)=0;
+    //virtual bool onTouchBegan(cocos2d::Touch * pTouch, cocos2d::Event * pEvent)=0;
+    //virtual void onTouchMoved(cocos2d::Touch * pTouch, cocos2d::Event * pEvent)=0;
+    //virtual void onTouchEnded(cocos2d::Touch * pTouch, cocos2d::Event * pEvent)=0;
+    
     
     //if gesture is correctly recognized, cancel touch over other views (default: false)
     //NOTE: subclasses must check the value and implement it correctly
     CC_SYNTHESIZE(bool, cancelsTouchesInView, CancelsTouchesInView);
 private:
     cocos2d::SEL_CallFuncO selector;
-    cocos2d::CCObject * target;
-    cocos2d::CCTouchDispatcher * dispatcher;
+    cocos2d::Object * target;
+    cocos2d::EventDispatcher * dispatcher;
+    std::function<void(cocos2d::Object*)> callback = NULL;
 };
 
 #endif

@@ -28,66 +28,76 @@ CCGestureRecognizer::CCGestureRecognizer()
 {
     isRecognizing = false;
     
-    dispatcher = CCDirector::sharedDirector()->getTouchDispatcher();
+    dispatcher = Director::getInstance()->getEventDispatcher();
     
-    setTouchEnabled(true);
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan = CC_CALLBACK_2(CCGestureRecognizer::onTouchBegan, this);
+    listener->onTouchMoved = CC_CALLBACK_2(CCGestureRecognizer::onTouchMoved, this);
+    listener->onTouchEnded = CC_CALLBACK_2(CCGestureRecognizer::onTouchEnded, this);
+    dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+    
     setCancelsTouchesInView(false);
 }
 
 CCGestureRecognizer::~CCGestureRecognizer()
 {
-    dispatcher->removeDelegate(this);
+    
 }
 
-void CCGestureRecognizer::setTarget(CCObject * tar, SEL_CallFuncO sel)
+void CCGestureRecognizer::setTarget(Object * tar, SEL_CallFuncO sel)
 {
     target = tar;
     selector = sel;
 }
 
-float CCGestureRecognizer::distanceBetweenPoints(CCPoint p1, CCPoint p2)
+void CCGestureRecognizer::setTarget(const std::function<void(cocos2d::Object *)> &callback)
 {
-    float deltaX = p2.x-p1.x;
-    float deltaY = p2.y-p1.y;
-    return fabs(sqrtf(deltaX*deltaX+deltaY*deltaY));
+    this->callback = callback;
 }
 
-void CCGestureRecognizer::stopTouchesPropagation(CCSet * pTouches, CCEvent * pEvent)
+float CCGestureRecognizer::distanceBetweenPoints(Point p1, Point p2)
+{
+    return p2.getDistance(p1);
+}
+
+void CCGestureRecognizer::stopTouchesPropagation(Set * pTouches, Event * pEvent)
 {
     //hack! cancel touch so it won't propagate
-    dispatcher->touchesCancelled(pTouches, pEvent);
+    //dispatcher->touchesCancelled(pTouches, pEvent);
+    pEvent->stopPropagation();
 }
 
-void CCGestureRecognizer::setParent(CCNode*p)
+void CCGestureRecognizer::setParent(Node*p)
 {
-    CCLayer::setParent(p);
+    Layer::setParent(p);
     
     if (p!=NULL) {
-        CCSize size = p->getContentSize();
+        Size size = p->getContentSize();
         setContentSize(size);
         setPosition(p->getPosition());
         frame = p->boundingBox();
     }
 }
 
-CCSet * CCGestureRecognizer::createSetWithTouch(CCTouch * pTouch)
+Set * CCGestureRecognizer::createSetWithTouch(Touch * pTouch)
 {
-    CCSet * set = new CCSet();
+    Set * set = new Set();
     set->addObject(pTouch);
     return set;
 }
-
+/*
 void CCGestureRecognizer::registerWithTouchDispatcher()
 {
     dispatcher->addTargetedDelegate(this, -256, false);
-}
+}*/
 
-bool CCGestureRecognizer::isPositionBetweenBounds(CCPoint pos)
+bool CCGestureRecognizer::isPositionBetweenBounds(Point pos)
 {
     return frame.containsPoint(pos);
 }
 
-void CCGestureRecognizer::gestureRecognized(cocos2d::CCObject * gesture)
+void CCGestureRecognizer::gestureRecognized(cocos2d::Object * gesture)
 {
-    if (target && selector) (target->*selector)(gesture); //call selector
+    if (callback) callback(gesture);
+    else if (target && selector) (target->*selector)(gesture); //call selector
 }

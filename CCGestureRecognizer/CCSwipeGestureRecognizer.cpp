@@ -36,7 +36,7 @@ CCSwipeGestureRecognizer::~CCSwipeGestureRecognizer()
     
 }
 
-bool CCSwipeGestureRecognizer::checkSwipeDirection(CCPoint p1, CCPoint p2, int & dir)
+bool CCSwipeGestureRecognizer::checkSwipeDirection(Point p1, Point p2, int & dir)
 {
     bool right = p2.x-p1.x>=kSwipeMinDistance;
     bool left = p1.x-p2.x>=kSwipeMinDistance;
@@ -71,7 +71,7 @@ bool CCSwipeGestureRecognizer::checkSwipeDirection(CCPoint p1, CCPoint p2, int &
     return false;
 }
 
-bool CCSwipeGestureRecognizer::ccTouchBegan(CCTouch * pTouch, CCEvent * pEvent)
+bool CCSwipeGestureRecognizer::onTouchBegan(Touch * pTouch, Event * pEvent)
 {
     if (isRecognizing) {
         isRecognizing = false;
@@ -81,27 +81,29 @@ bool CCSwipeGestureRecognizer::ccTouchBegan(CCTouch * pTouch, CCEvent * pEvent)
     initialPosition = pTouch->getLocation();
     if (!isPositionBetweenBounds(initialPosition)) return false;
     
-    CCTime::gettimeofdayCocos2d(&startTime, NULL);
-    
+    //Time::gettimeofdayCocos2d(&startTime, NULL);
+    startTime = getCurrentTime();
     isRecognizing = true;
     return true;
 }
 
-void CCSwipeGestureRecognizer::ccTouchEnded(CCTouch * pTouch, CCEvent * pEvent)
+void CCSwipeGestureRecognizer::onTouchEnded(Touch * pTouch, Event * pEvent)
 {
-    CCPoint finalPosition = pTouch->getLocation();
+    Point finalPosition = pTouch->getLocation();
     if (!isPositionBetweenBounds(finalPosition)) {
         isRecognizing = false;
         return;
     }
     
     //distance between initial and final point of touch
-    float distance = distanceBetweenPoints(initialPosition, finalPosition);
+    float distance = finalPosition.getDistance(initialPosition);
     
-    struct cc_timeval currentTime;
-    CCTime::gettimeofdayCocos2d(&currentTime, NULL);
-    
-    double duration = CCTime::timersubCocos2d(&startTime, &currentTime); //duration in milliseconds
+    //struct cc_timeval currentTime;
+    //Time::gettimeofdayCocos2d(&currentTime, NULL);
+    std::chrono::high_resolution_clock::time_point currentTime = getCurrentTime();
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(startTime - currentTime);
+
+    double duration = time_span.count();
     
     //check that minimum distance has been reached
     //check that maximum duration hasn't been reached
