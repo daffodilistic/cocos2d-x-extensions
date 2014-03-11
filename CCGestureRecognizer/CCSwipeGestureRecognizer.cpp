@@ -81,7 +81,6 @@ bool CCSwipeGestureRecognizer::onTouchBegan(Touch * pTouch, Event * pEvent)
     initialPosition = pTouch->getLocation();
     if (!isPositionBetweenBounds(initialPosition)) return false;
     
-    //Time::gettimeofdayCocos2d(&startTime, NULL);
     startTime = getCurrentTime();
     isRecognizing = true;
     return true;
@@ -98,12 +97,8 @@ void CCSwipeGestureRecognizer::onTouchEnded(Touch * pTouch, Event * pEvent)
     //distance between initial and final point of touch
     float distance = finalPosition.getDistance(initialPosition);
     
-    //struct cc_timeval currentTime;
-    //Time::gettimeofdayCocos2d(&currentTime, NULL);
     std::chrono::high_resolution_clock::time_point currentTime = getCurrentTime();
-    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(startTime - currentTime);
-
-    double duration = time_span.count();
+    double duration = getTimeDifference(currentTime, startTime);
     
     //check that minimum distance has been reached
     //check that maximum duration hasn't been reached
@@ -113,9 +108,10 @@ void CCSwipeGestureRecognizer::onTouchEnded(Touch * pTouch, Event * pEvent)
         CCSwipe * swipe = CCSwipe::create();
         swipe->direction = (CCSwipeGestureRecognizerDirection)dir;
         swipe->location = initialPosition;
+        swipe->cancelPropagation = cancelsTouchesInView;
         
         gestureRecognized(swipe);
-        if (cancelsTouchesInView) stopTouchesPropagation(createSetWithTouch(pTouch), pEvent); //cancel touch over other views
+        if (swipe->cancelPropagation) stopTouchesPropagation(pEvent); //cancel touch over other views
     }
     
     isRecognizing = false;

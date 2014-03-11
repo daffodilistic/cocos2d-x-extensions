@@ -37,13 +37,11 @@ typedef enum {
 } CCSwipeGestureRecognizerDirection;
 
 //this class is used for storing information about the swipe gesture
-class CCSwipe : public cocos2d::Object
+class CCSwipe : public CCGesture
 {
 public:
-    bool init() {return true;}
     CREATE_FUNC(CCSwipe);
     CCSwipeGestureRecognizerDirection direction;
-    cocos2d::Point location;
 };
 
 class CCSwipeGestureRecognizer : public CCGestureRecognizer
@@ -58,7 +56,7 @@ public:
     virtual void onTouchEnded(cocos2d::Touch * pTouch, cocos2d::Event * pEvent);
 protected:
     CC_SYNTHESIZE(int, direction, Direction);
-    std::chrono::high_resolution_clock::time_point getCurrentTime() { return std::chrono::high_resolution_clock::now(); }
+    
 private:
     cocos2d::Point initialPosition;
     //struct cocos2d::cc_timeval startTime;

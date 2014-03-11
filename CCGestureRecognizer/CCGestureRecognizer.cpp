@@ -44,15 +44,37 @@ CCGestureRecognizer::~CCGestureRecognizer()
     
 }
 
-void CCGestureRecognizer::setTarget(Object * tar, SEL_CallFuncO sel)
+void CCGestureRecognizer::setTarget(Object * tar, SEL_CallFuncGR sel)
 {
     target = tar;
     selector = sel;
 }
 
-void CCGestureRecognizer::setTarget(const std::function<void(cocos2d::Object *)> &callback)
+void CCGestureRecognizer::setTarget(const std::function<void(CCGesture *)> &callback)
 {
     this->callback = callback;
+}
+
+void CCGestureRecognizer::setTargetForBegan(Object * tar, SEL_CallFuncGR sel)
+{
+    targetForBegan = tar;
+    selectorForBegan = sel;
+}
+
+void CCGestureRecognizer::setTargetForBegan(const std::function<void(CCGesture *)> &callback)
+{
+    this->callbackForBegan = callback;
+}
+
+void CCGestureRecognizer::setTargetForEnded(Object * tar, SEL_CallFuncGR sel)
+{
+    targetForEnded = tar;
+    selectorForEnded = sel;
+}
+
+void CCGestureRecognizer::setTargetForEnded(const std::function<void(CCGesture *)> &callback)
+{
+    this->callbackForEnded = callback;
 }
 
 float CCGestureRecognizer::distanceBetweenPoints(Point p1, Point p2)
@@ -60,10 +82,9 @@ float CCGestureRecognizer::distanceBetweenPoints(Point p1, Point p2)
     return p2.getDistance(p1);
 }
 
-void CCGestureRecognizer::stopTouchesPropagation(Set * pTouches, Event * pEvent)
+
+void CCGestureRecognizer::stopTouchesPropagation(Event * pEvent)
 {
-    //hack! cancel touch so it won't propagate
-    //dispatcher->touchesCancelled(pTouches, pEvent);
     pEvent->stopPropagation();
 }
 
@@ -79,25 +100,25 @@ void CCGestureRecognizer::setParent(Node*p)
     }
 }
 
-Set * CCGestureRecognizer::createSetWithTouch(Touch * pTouch)
-{
-    Set * set = new Set();
-    set->addObject(pTouch);
-    return set;
-}
-/*
-void CCGestureRecognizer::registerWithTouchDispatcher()
-{
-    dispatcher->addTargetedDelegate(this, -256, false);
-}*/
-
 bool CCGestureRecognizer::isPositionBetweenBounds(Point pos)
 {
     return frame.containsPoint(pos);
 }
 
-void CCGestureRecognizer::gestureRecognized(cocos2d::Object * gesture)
+void CCGestureRecognizer::gestureRecognized(CCGesture * gesture)
 {
     if (callback) callback(gesture);
     else if (target && selector) (target->*selector)(gesture); //call selector
+}
+
+void CCGestureRecognizer::gestureBegan(CCGesture * gesture)
+{
+    if (callbackForBegan) callbackForBegan(gesture);
+    else if (targetForBegan && selectorForBegan) (targetForBegan->*selectorForBegan)(gesture); //call selector
+}
+
+void CCGestureRecognizer::gestureEnded(CCGesture * gesture)
+{
+    if (callbackForEnded) callbackForEnded(gesture);
+    else if (targetForEnded && selectorForEnded) (targetForEnded->*selectorForEnded)(gesture); //call selector
 }
