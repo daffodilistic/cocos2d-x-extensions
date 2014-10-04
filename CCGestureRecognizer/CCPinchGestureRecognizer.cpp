@@ -97,10 +97,10 @@ void CCPinchGestureRecognizer::onTouchEnded(Touch * pTouch, Event * pEvent)
     isRecognizing = false;
     lastDistance = 0;
     touchNumber--;
-    touches(pTouch);
+    //touches(pTouch);
     
     //cancel touch over other views if necessary
     if (cancelsTouchesInView) {
-        stopTouchesPropagation(createSetWithTouch(pTouch), pEvent);
+        //stopTouchesPropagation(createSetWithTouch(pTouch), pEvent);
     }
 }

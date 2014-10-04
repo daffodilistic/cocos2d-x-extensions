@@ -44,7 +44,7 @@ CCGestureRecognizer::~CCGestureRecognizer()
     
 }
 
-void CCGestureRecognizer::setTarget(Object * tar, SEL_CallFuncGR sel)
+void CCGestureRecognizer::setTarget(Ref * tar, SEL_CallFuncGR sel)
 {
     target = tar;
     selector = sel;
@@ -55,7 +55,7 @@ void CCGestureRecognizer::setTarget(const std::function<void(CCGesture *)> &call
     this->callback = callback;
 }
 
-void CCGestureRecognizer::setTargetForBegan(Object * tar, SEL_CallFuncGR sel)
+void CCGestureRecognizer::setTargetForBegan(Ref * tar, SEL_CallFuncGR sel)
 {
     targetForBegan = tar;
     selectorForBegan = sel;
@@ -66,7 +66,7 @@ void CCGestureRecognizer::setTargetForBegan(const std::function<void(CCGesture *
     this->callbackForBegan = callback;
 }
 
-void CCGestureRecognizer::setTargetForEnded(Object * tar, SEL_CallFuncGR sel)
+void CCGestureRecognizer::setTargetForEnded(Ref * tar, SEL_CallFuncGR sel)
 {
     targetForEnded = tar;
     selectorForEnded = sel;

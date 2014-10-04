@@ -32,7 +32,7 @@ typedef void (cocos2d::Object::*SEL_CallFuncGR)(CCGesture*);
 #define callfuncGR_selector(_SELECTOR) static_cast<SEL_CallFuncGR>(&_SELECTOR)
 
 
-class CCGesture : public cocos2d::Object
+class CCGesture : public cocos2d::Ref
 {
 public:
     bool init() {return true;}
@@ -48,11 +48,11 @@ class CCGestureRecognizer : public cocos2d::Layer
 public:
     CCGestureRecognizer();
     ~CCGestureRecognizer();
-    void setTarget(cocos2d::Object * tar, SEL_CallFuncGR sel);
+    void setTarget(cocos2d::Ref * tar, SEL_CallFuncGR sel);
     void setTarget(const std::function<void(CCGesture*)> &callback);
-    void setTargetForBegan(cocos2d::Object * tar, SEL_CallFuncGR sel);
+    void setTargetForBegan(cocos2d::Ref * tar, SEL_CallFuncGR sel);
     void setTargetForBegan(const std::function<void(CCGesture*)> &callback);
-    void setTargetForEnded(cocos2d::Object * tar, SEL_CallFuncGR sel);
+    void setTargetForEnded(cocos2d::Ref * tar, SEL_CallFuncGR sel);
     void setTargetForEnded(const std::function<void(CCGesture*)> &callback);
     
     //setParent is called after the layer is added as a child
@@ -81,7 +81,7 @@ protected:
     CC_SYNTHESIZE(bool, cancelsTouchesInView, CancelsTouchesInView);
 private:
     SEL_CallFuncGR selector, selectorForBegan, selectorForEnded;
-    cocos2d::Object * target, * targetForBegan, * targetForEnded;
+    cocos2d::Ref * target, * targetForBegan, * targetForEnded;
     std::function<void(CCGesture*)> callback = NULL, callbackForBegan = NULL, callbackForEnded = NULL;
     cocos2d::EventDispatcher * dispatcher;
 };

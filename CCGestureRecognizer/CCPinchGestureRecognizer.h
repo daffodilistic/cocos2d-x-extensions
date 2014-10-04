@@ -34,7 +34,7 @@ typedef enum {
 } CCPinchGestureRecognizerType;
 
 //this class is used for storing information about the pinch gesture
-class CCPinch : public cocos2d::Object
+class CCPinch : public CCGesture
 {
 public:
     bool init() {return true;}
